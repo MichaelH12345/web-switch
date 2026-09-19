@@ -62,8 +62,55 @@
         const mainWebsite = document.getElementById("mainWebsite");
         const timedWebsite = document.getElementById("timedWebsite");
 
-        let showingTimed = false;
+        const timedURL =
+            "https://michaelh12345.github.io/depart_screen_adverts";
 
+        let showingTimed = false;
+        let lastRefreshMinute = -1;
+        let lastSwitchMinute = -1;
+
+
+        // ==================================================
+        // REFRESH TIMED WEBSITE AT XX:44.5
+        // ==================================================
+
+        function checkRefresh() {
+
+            const now = new Date();
+
+            const seconds = now.getSeconds();
+            const milliseconds = now.getMilliseconds();
+            const minute = now.getMinutes();
+
+            /*
+                Refresh between:
+
+                XX:44.500
+                and
+                XX:44.749
+
+                This gives us a small window so the browser
+                doesn't need to hit the exact millisecond.
+            */
+
+            if (
+                seconds === 44 &&
+                milliseconds >= 500 &&
+                milliseconds < 750 &&
+                minute !== lastRefreshMinute
+            ) {
+
+                lastRefreshMinute = minute;
+
+                // Reload the timed website
+                timedWebsite.src = timedURL;
+            }
+        }
+
+
+        // ==================================================
+        // SWITCH TO TIMED WEBSITE AT XX:45
+        // ==================================================
 
         function switchToTimed() {
 
@@ -71,84 +118,83 @@
 
             showingTimed = true;
 
-
-            // =========================
-            // FADE MAIN WEBSITE OUT
-            // =========================
-
+            // Fade main website out
             mainWebsite.style.opacity = "0";
             mainWebsite.style.pointerEvents = "none";
 
 
-            // =========================
-            // FADE TIMED WEBSITE IN
-            // =========================
-
+            // After the 0.5 second fade,
+            // show the freshly refreshed timed website
             setTimeout(() => {
 
                 timedWebsite.style.opacity = "1";
 
-                // TIMED WEBSITE IS NOW CLICKABLE
+                // Timed website is interactive
                 timedWebsite.style.pointerEvents = "auto";
 
-            }, 1000);
+            }, 500);
 
 
-            // =========================
-            // AFTER 10 SECONDS
-            // =========================
+            // ==================================================
+            // KEEP TIMED WEBSITE ON SCREEN FOR 10 SECONDS
+            // ==================================================
 
             setTimeout(() => {
 
-                // Stop interaction with timed website
+                // Disable interaction
                 timedWebsite.style.pointerEvents = "none";
 
                 // Fade timed website out
                 timedWebsite.style.opacity = "0";
 
 
-                // =========================
-                // FADE MAIN WEBSITE BACK IN
-                // =========================
-
+                // Fade main website back in
                 setTimeout(() => {
 
                     mainWebsite.style.opacity = "1";
-
-                    // MAIN WEBSITE IS CLICKABLE AGAIN
                     mainWebsite.style.pointerEvents = "auto";
 
                     showingTimed = false;
 
-                }, 1000);
+                }, 500);
 
-            }, 11000);
+            }, 10500);
         }
 
 
-        // =========================
+        // ==================================================
         // CHECK REAL CLOCK
-        // =========================
+        // ==================================================
 
         function checkTime() {
 
             const now = new Date();
 
             const seconds = now.getSeconds();
+            const minute = now.getMinutes();
 
 
             // Trigger at XX:45
-            if (seconds === 45 && !showingTimed) {
+            if (
+                seconds === 45 &&
+                minute !== lastSwitchMinute &&
+                !showingTimed
+            ) {
+
+                lastSwitchMinute = minute;
 
                 switchToTimed();
-
             }
-
         }
 
 
-        // Check the real clock frequently
-        setInterval(checkTime, 250);
+        // Check the clock very frequently
+        setInterval(() => {
+
+            checkRefresh();
+            checkTime();
+
+        }, 50);
 
     </script>
 
