@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timed Website Switcher</title>
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: black;
+        }
+
+        .website {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            transition: opacity 1s ease;
+        }
+
+        /* MAIN WEBSITE */
+        #mainWebsite {
+            opacity: 1;
+            z-index: 1;
+            pointer-events: auto;
+        }
+
+        /* TIMED WEBSITE */
+        #timedWebsite {
+            opacity: 0;
+            z-index: 2;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- MAIN WEBSITE -->
+    <iframe
+        id="mainWebsite"
+        class="website"
+        src="https://michaelh12345.github.io/dual_web/">
+    </iframe>
+
+    <!-- TIMED WEBSITE -->
+    <iframe
+        id="timedWebsite"
+        class="website"
+        src="https://michaelh12345.github.io/depart_screen_adverts">
+    </iframe>
+
+
+    <script>
+
+        const mainWebsite = document.getElementById("mainWebsite");
+        const timedWebsite = document.getElementById("timedWebsite");
+
+        let showingTimed = false;
+
+
+        function switchToTimed() {
+
+            if (showingTimed) return;
+
+            showingTimed = true;
+
+
+            // =========================
+            // FADE MAIN WEBSITE OUT
+            // =========================
+
+            mainWebsite.style.opacity = "0";
+            mainWebsite.style.pointerEvents = "none";
+
+
+            // =========================
+            // FADE TIMED WEBSITE IN
+            // =========================
+
+            setTimeout(() => {
+
+                timedWebsite.style.opacity = "1";
+
+                // TIMED WEBSITE IS NOW CLICKABLE
+                timedWebsite.style.pointerEvents = "auto";
+
+            }, 1000);
+
+
+            // =========================
+            // AFTER 10 SECONDS
+            // =========================
+
+            setTimeout(() => {
+
+                // Stop interaction with timed website
+                timedWebsite.style.pointerEvents = "none";
+
+                // Fade timed website out
+                timedWebsite.style.opacity = "0";
+
+
+                // =========================
+                // FADE MAIN WEBSITE BACK IN
+                // =========================
+
+                setTimeout(() => {
+
+                    mainWebsite.style.opacity = "1";
+
+                    // MAIN WEBSITE IS CLICKABLE AGAIN
+                    mainWebsite.style.pointerEvents = "auto";
+
+                    showingTimed = false;
+
+                }, 1000);
+
+            }, 11000);
+        }
+
+
+        // =========================
+        // CHECK REAL CLOCK
+        // =========================
+
+        function checkTime() {
+
+            const now = new Date();
+
+            const seconds = now.getSeconds();
+
+
+            // Trigger at XX:45
+            if (seconds === 45 && !showingTimed) {
+
+                switchToTimed();
+
+            }
+
+        }
+
+
+        // Check the real clock frequently
+        setInterval(checkTime, 250);
+
+    </script>
+
+</body>
+</html>
